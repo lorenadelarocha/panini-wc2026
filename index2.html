@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panini FIFA World Cup 2026 — Sticker Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #d42027;
+    --gold: #f5b800;
+    --green: #3db54a;
+    --orange: #f47920;
+    --blue: #1b3d8f;
+    --purple: #7b3fa0;
+    --bg: #f0ebe0;
+    --surface: #fff9f0;
+    --surface2: #e8e0d0;
+    --border: #c8bfad;
+    --text: #1a1a2e;
+    --muted: #6b5e4e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8bfad' fill-opacity='0.25'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ─────────────────────────────────────── */
+  header {
+    background: var(--blue);
+    background-image: linear-gradient(135deg, #1b3d8f 0%, #0d2460 60%, #1b3d8f 100%);
+    padding: 20px 20px 0;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(27,61,143,0.4);
+    border-bottom: 4px solid var(--red);
+  }
+  header h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.2rem, 4vw, 1.9rem);
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #fff;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.35);
+  }
+  header h1 span { color: var(--gold); }
+
+  .header-stats {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #fff;
+  }
+  .stat-pill .num { color: var(--gold); font-size: 0.95rem; }
+
+  .progress-wrap {
+    background: rgba(0,0,0,0.2);
+    padding: 8px 20px 0;
+    text-align: center;
+  }
+  .progress-bar-track {
+    background: rgba(0,0,0,0.3);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+    max-width: 500px;
+    margin: 4px auto 0;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--gold));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.85);
+    font-weight: 600;
+  }
+
+  /* ── TABS ───────────────────────────────────────── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-top: 12px;
+    justify-content: center;
+  }
+  .tab-btn {
+    padding: 8px 28px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 8px 8px 0 0;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 0.3px;
+  }
+  .tab-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .tab-btn.active {
+    background: var(--bg);
+    color: var(--blue);
+    box-shadow: inset 0 -2px 0 var(--gold);
+  }
+
+  /* ── CONTROLS (album tab) ───────────────────────── */
+  .controls {
+    padding: 12px 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    background: var(--bg);
+    border-bottom: 2px solid var(--border);
+  }
+  .search-box {
+    flex: 1;
+    min-width: 160px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    font-weight: 500;
+  }
+  .search-box:focus { border-color: var(--blue); }
+  .search-box::placeholder { color: var(--muted); }
+
+  .filter-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 11px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .filter-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+  .btn-reset {
+    background: transparent;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 11px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-reset:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── LEGEND ─────────────────────────────────────── */
+  .legend {
+    display: flex;
+    gap: 16px;
+    padding: 7px 20px;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    font-size: 0.73rem;
+    color: var(--muted);
+    flex-wrap: wrap;
+    font-weight: 600;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
+  .dot-missing { background: var(--surface2); border: 2px solid var(--border); }
+  .dot-owned { background: var(--green); }
+  .dot-dupe { background: var(--orange); }
+  .legend-tip { margin-left: auto; font-style: italic; font-weight: 400; }
+
+  /* ── ALBUM MAIN ─────────────────────────────────── */
+  #view-album { display: block; }
+  #view-missing { display: none; }
+
+  main { padding: 16px 20px 40px; }
+
+  /* ── TEAM SECTION ───────────────────────────────── */
+  .team-section {
+    margin-bottom: 18px;
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    box-shadow: 3px 3px 0 var(--border);
+  }
+  .team-section.hidden { display: none; }
+  .team-section[data-conf="UEFA"]     { border-left: 4px solid var(--blue); }
+  .team-section[data-conf="Africa"]   { border-left: 4px solid var(--red); }
+  .team-section[data-conf="CONMEBOL"] { border-left: 4px solid var(--green); }
+  .team-section[data-conf="Asia"]     { border-left: 4px solid var(--purple); }
+  .team-section[data-conf="CONCACAF"] { border-left: 4px solid var(--orange); }
+  .team-section[data-conf="Oceania"]  { border-left: 4px solid #0ea5e9; }
+
+  .team-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    background: var(--surface2);
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 2px solid var(--border);
+  }
+  .team-header:hover { background: #ddd5c2; }
+  .team-section.collapsed .team-header { border-bottom: none; }
+  .team-flag { font-size: 1.4rem; line-height: 1; }
+  .team-name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: 0.98rem;
+    flex: 1;
+    color: var(--text);
+  }
+  .team-code {
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-family: monospace;
+    font-weight: 700;
+    background: var(--border);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  .team-progress { display: flex; align-items: center; gap: 8px; }
+  .team-mini-bar {
+    width: 56px; height: 6px;
+    background: var(--border);
+    border-radius: 99px; overflow: hidden;
+  }
+  .team-mini-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 99px;
+    transition: width 0.3s;
+  }
+  .team-count { font-size: 0.72rem; color: var(--muted); min-width: 34px; text-align: right; font-weight: 700; }
+  .team-chevron { color: var(--muted); font-size: 0.8rem; transition: transform 0.2s; }
+  .team-section.collapsed .team-chevron { transform: rotate(-90deg); }
+
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(66px, 1fr));
+    gap: 6px;
+    padding: 12px;
+  }
+  .team-section.collapsed .sticker-grid { display: none; }
+
+  /* ── STICKER CARD ───────────────────────────────── */
+  .sticker {
+    aspect-ratio: 2/3;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    border: 2px solid var(--border);
+    position: relative;
+    background: var(--surface2);
+    user-select: none;
+    padding: 4px;
+    text-align: center;
+    box-shadow: 2px 2px 0 var(--border);
+  }
+  .sticker:hover { transform: scale(1.06) rotate(-1deg); box-shadow: 4px 4px 0 var(--border); }
+  .sticker:active { transform: scale(0.97); }
+
+  .sticker.owned  { background: #d4f5e0; border-color: var(--green);  box-shadow: 2px 2px 0 var(--green); }
+  .sticker.dupe   { background: #fde8d2; border-color: var(--orange); box-shadow: 2px 2px 0 var(--orange); }
+  .sticker.foil   { background: linear-gradient(135deg,#fdf6d8,#fff9e6,#fcedb0); border-color: var(--gold); box-shadow: 2px 2px 0 #c9930a; }
+  .sticker.foil.owned { background: linear-gradient(135deg,#d4f5e0,#e8faf0); border-color: var(--green); box-shadow: 2px 2px 0 var(--green); }
+  .sticker.foil.dupe  { background: linear-gradient(135deg,#fde8d2,#fff0e4); border-color: var(--orange); box-shadow: 2px 2px 0 var(--orange); }
+
+  .sticker-num {
+    font-size: 0.58rem; font-weight: 700;
+    font-family: monospace; color: var(--muted); letter-spacing: 0.5px;
+  }
+  .sticker.owned .sticker-num { color: #166534; }
+  .sticker.dupe  .sticker-num { color: #9a3412; }
+  .sticker-icon  { font-size: 1.15rem; margin: 2px 0; }
+  .sticker-label {
+    font-size: 0.48rem; color: var(--muted);
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; line-height: 1.2;
+  }
+  .sticker.owned .sticker-label { color: #166534; }
+  .sticker.dupe  .sticker-label { color: #9a3412; }
+  .sticker-status { position: absolute; top: 2px; right: 3px; font-size: 0.58rem; }
+
+  /* ── SPECIAL SECTION ────────────────────────────── */
+  .special-section {
+    background: var(--surface);
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    box-shadow: 3px 3px 0 #c9930a;
+  }
+  .special-header {
+    background: linear-gradient(90deg,#fff8d6,#fffcec);
+    border-bottom: 2px solid var(--gold);
+    padding: 11px 16px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer;
+  }
+  .special-header:hover { background: #fff3bb; }
+  .special-section.collapsed .special-header { border-bottom: none; }
+  .special-section.collapsed .sticker-grid   { display: none; }
+  .special-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700; color: #7c5a00; flex: 1;
+  }
+
+  /* ── NO RESULTS ─────────────────────────────────── */
+  .no-results {
+    text-align: center; padding: 60px 20px;
+    color: var(--muted); display: none; font-weight: 600;
+  }
+  .no-results.show { display: block; }
+
+  /* ═══════════════════════════════════════════════════
+     MISSING TAB
+  ═══════════════════════════════════════════════════ */
+  #view-missing {
+    padding: 20px 20px 40px;
+  }
+
+  .missing-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .missing-header h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .missing-header h2 span {
+    color: var(--red);
+  }
+  .missing-search {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    width: 200px;
+  }
+  .missing-search:focus { border-color: var(--blue); }
+  .missing-search::placeholder { color: var(--muted); }
+
+  .missing-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--green);
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: 'Playfair Display', Georgia, serif;
+    display: none;
+  }
+  .missing-empty.show { display: block; }
+
+  .missing-team-block {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    box-shadow: 3px 3px 0 var(--border);
+  }
+  .missing-team-block[data-conf="UEFA"]     { border-left: 4px solid var(--blue); }
+  .missing-team-block[data-conf="Africa"]   { border-left: 4px solid var(--red); }
+  .missing-team-block[data-conf="CONMEBOL"] { border-left: 4px solid var(--green); }
+  .missing-team-block[data-conf="Asia"]     { border-left: 4px solid var(--purple); }
+  .missing-team-block[data-conf="CONCACAF"] { border-left: 4px solid var(--orange); }
+  .missing-team-block[data-conf="Oceania"]  { border-left: 4px solid #0ea5e9; }
+  .missing-team-block.hidden { display: none; }
+
+  .missing-team-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--surface2);
+    border-bottom: 2px solid var(--border);
+  }
+  .missing-team-name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    flex: 1;
+  }
+  .missing-count-badge {
+    background: var(--red);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+
+  .missing-chips {
+    padding: 10px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-family: monospace;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .chip:hover {
+    background: #d4f5e0;
+    border-color: var(--green);
+    color: #166534;
+  }
+  .chip.foil-chip {
+    background: linear-gradient(135deg,#fdf6d8,#fffcec);
+    border-color: var(--gold);
+    color: #7c5a00;
+  }
+  .chip.foil-chip:hover {
+    background: #d4f5e0;
+    border-color: var(--green);
+    color: #166534;
+  }
+
+  /* ── PRINT BUTTON ───────────────────────────────── */
+  .btn-print {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-print:hover { background: #0d2460; }
+
+  @media print {
+    header, .controls, .legend, .tabs { display: none !important; }
+    #view-album { display: none !important; }
+    #view-missing { display: block !important; padding: 0; }
+    .missing-header { margin-bottom: 12px; }
+    .btn-print { display: none; }
+    body { background: #fff; background-image: none; }
+    .missing-team-block { box-shadow: none; break-inside: avoid; }
+  }
+
+  @media (max-width: 480px) {
+    .sticker-grid { grid-template-columns: repeat(auto-fill, minmax(56px,1fr)); gap: 5px; }
+    .tab-btn { padding: 7px 16px; font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ════════════════════════════════════════ -->
+<header>
+  <h1>⚽ Panini FIFA <span>World Cup 2026™</span> Sticker Tracker</h1>
+  <div class="header-stats">
+    <div class="stat-pill">✅ Owned: <span class="num" id="totalOwned">0</span></div>
+    <div class="stat-pill">❌ Missing: <span class="num" id="totalMissing">980</span></div>
+    <div class="stat-pill">🔁 Duplicates: <span class="num" id="totalDupe">0</span></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span id="pct">0%</span> of 980 stickers collected</div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="mainBar" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="album">📋 My Album</button>
+    <button class="tab-btn" data-tab="missing">❌ Missing Stickers</button>
+  </div>
+</header>
+
+<!-- ═══ ALBUM VIEW ════════════════════════════════════ -->
+<div id="view-album">
+  <div class="controls">
+    <input class="search-box" type="text" id="search" placeholder="🔍 Search team...">
+    <div class="filter-btns">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="missing">Incomplete</button>
+      <button class="filter-btn" data-filter="complete">Complete ✅</button>
+      <button class="filter-btn" data-filter="dupe">Has Dupes 🔁</button>
+    </div>
+    <button class="btn-reset" id="btnReset">🗑 Reset</button>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot dot-missing"></div> Missing</div>
+    <div class="legend-item"><div class="legend-dot dot-owned"></div> Owned</div>
+    <div class="legend-item"><div class="legend-dot dot-dupe"></div> Duplicate</div>
+    <div class="legend-tip">Click a sticker to cycle: Missing → Owned → Duplicate</div>
+  </div>
+  <main id="main">
+    <div class="no-results" id="noResults">No teams match your search 🤷</div>
+  </main>
+</div>
+
+<!-- ═══ MISSING VIEW ══════════════════════════════════ -->
+<div id="view-missing">
+  <div class="missing-header">
+    <h2>Missing Stickers <span id="missingCount"></span></h2>
+    <input class="missing-search" type="text" id="missingSearch" placeholder="🔍 Filter teams…">
+    <button class="btn-print" onclick="window.print()">🖨 Print list</button>
+  </div>
+  <div class="missing-empty" id="missingEmpty">🎉 Album complete! Not a single sticker missing.</div>
+  <div id="missingList"></div>
+</div>
+
+<script>
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+const TOTAL = 980;
+
+const SPECIAL = [
+  { code:'00',    label:'Panini Logo', icon:'🏅', foil:true  },
+  { code:'FWC1',  label:'Emblem',      icon:'🏆', foil:true  },
+  { code:'FWC2',  label:'Emblem',      icon:'🏆', foil:true  },
+  { code:'FWC3',  label:'Mascots',     icon:'🦅', foil:true  },
+  { code:'FWC4',  label:'Slogan',      icon:'🌟', foil:true  },
+  { code:'FWC5',  label:'Ball',        icon:'⚽', foil:true  },
+  { code:'FWC6',  label:'Canada',      icon:'🇨🇦', foil:true },
+  { code:'FWC7',  label:'Mexico',      icon:'🇲🇽', foil:true },
+  { code:'FWC8',  label:'USA',         icon:'🇺🇸', foil:true },
+  { code:'MUS1',  label:'WC 1930',     icon:'🥇', foil:false },
+  { code:'MUS2',  label:'WC 1934',     icon:'🥇', foil:false },
+  { code:'MUS3',  label:'WC 1938',     icon:'🥇', foil:false },
+  { code:'MUS4',  label:'WC 1950',     icon:'🥇', foil:false },
+  { code:'MUS5',  label:'WC 1954',     icon:'🥇', foil:false },
+  { code:'MUS6',  label:'WC 1958',     icon:'🥇', foil:false },
+  { code:'MUS7',  label:'WC 1962',     icon:'🥇', foil:false },
+  { code:'MUS8',  label:'WC 1966',     icon:'🥇', foil:false },
+  { code:'MUS9',  label:'WC 1970',     icon:'🥇', foil:false },
+  { code:'MUS10', label:'WC 1974',     icon:'🥇', foil:false },
+  { code:'MUS11', label:'WC 1978',     icon:'🥇', foil:false },
+];
+
+const TEAMS = [
+  { code:'MEX', name:'Mexico',               flag:'🇲🇽', conf:'CONCACAF' },
+  { code:'RSA', name:'South Africa',         flag:'🇿🇦', conf:'Africa'   },
+  { code:'KOR', name:'South Korea',          flag:'🇰🇷', conf:'Asia'     },
+  { code:'CZE', name:'Czechia',              flag:'🇨🇿', conf:'UEFA'     },
+  { code:'CAN', name:'Canada',               flag:'🇨🇦', conf:'CONCACAF' },
+  { code:'BIH', name:'Bosnia & Herzegovina', flag:'🇧🇦', conf:'UEFA'     },
+  { code:'QAT', name:'Qatar',                flag:'🇶🇦', conf:'Asia'     },
+  { code:'SUI', name:'Switzerland',          flag:'🇨🇭', conf:'UEFA'     },
+  { code:'BRA', name:'Brazil',               flag:'🇧🇷', conf:'CONMEBOL' },
+  { code:'MAR', name:'Morocco',              flag:'🇲🇦', conf:'Africa'   },
+  { code:'HAI', name:'Haiti',                flag:'🇭🇹', conf:'CONCACAF' },
+  { code:'SCO', name:'Scotland',             flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', conf:'UEFA'     },
+  { code:'USA', name:'USA',                  flag:'🇺🇸', conf:'CONCACAF' },
+  { code:'PAR', name:'Paraguay',             flag:'🇵🇾', conf:'CONMEBOL' },
+  { code:'AUS', name:'Australia',            flag:'🇦🇺', conf:'Asia'     },
+  { code:'TUR', name:'Türkiye',              flag:'🇹🇷', conf:'UEFA'     },
+  { code:'GER', name:'Germany',              flag:'🇩🇪', conf:'UEFA'     },
+  { code:'CUW', name:'Curaçao',              flag:'🇨🇼', conf:'CONCACAF' },
+  { code:'CIV', name:'Ivory Coast',          flag:'🇨🇮', conf:'Africa'   },
+  { code:'ECU', name:'Ecuador',              flag:'🇪🇨', conf:'CONMEBOL' },
+  { code:'NED', name:'Netherlands',          flag:'🇳🇱', conf:'UEFA'     },
+  { code:'JPN', name:'Japan',                flag:'🇯🇵', conf:'Asia'     },
+  { code:'SWE', name:'Sweden',               flag:'🇸🇪', conf:'UEFA'     },
+  { code:'TUN', name:'Tunisia',              flag:'🇹🇳', conf:'Africa'   },
+  { code:'BEL', name:'Belgium',              flag:'🇧🇪', conf:'UEFA'     },
+  { code:'EGY', name:'Egypt',                flag:'🇪🇬', conf:'Africa'   },
+  { code:'IRN', name:'Iran',                 flag:'🇮🇷', conf:'Asia'     },
+  { code:'NZL', name:'New Zealand',          flag:'🇳🇿', conf:'Oceania'  },
+  { code:'ALG', name:'Algeria',              flag:'🇩🇿', conf:'Africa'   },
+  { code:'ARG', name:'Argentina',            flag:'🇦🇷', conf:'CONMEBOL' },
+  { code:'AUT', name:'Austria',              flag:'🇦🇹', conf:'UEFA'     },
+  { code:'CPV', name:'Cape Verde',           flag:'🇨🇻', conf:'Africa'   },
+  { code:'COL', name:'Colombia',             flag:'🇨🇴', conf:'CONMEBOL' },
+  { code:'COD', name:'Congo DR',             flag:'🇨🇩', conf:'Africa'   },
+  { code:'CRO', name:'Croatia',              flag:'🇭🇷', conf:'UEFA'     },
+  { code:'FRA', name:'France',               flag:'🇫🇷', conf:'UEFA'     },
+  { code:'GHA', name:'Ghana',                flag:'🇬🇭', conf:'Africa'   },
+  { code:'IRQ', name:'Iraq',                 flag:'🇮🇶', conf:'Asia'     },
+  { code:'JOR', name:'Jordan',               flag:'🇯🇴', conf:'Asia'     },
+  { code:'NOR', name:'Norway',               flag:'🇳🇴', conf:'UEFA'     },
+  { code:'PAN', name:'Panama',               flag:'🇵🇦', conf:'CONCACAF' },
+  { code:'POR', name:'Portugal',             flag:'🇵🇹', conf:'UEFA'     },
+  { code:'KSA', name:'Saudi Arabia',         flag:'🇸🇦', conf:'Asia'     },
+  { code:'SEN', name:'Senegal',              flag:'🇸🇳', conf:'Africa'   },
+  { code:'ESP', name:'Spain',                flag:'🇪🇸', conf:'UEFA'     },
+  { code:'URU', name:'Uruguay',              flag:'🇺🇾', conf:'CONMEBOL' },
+  { code:'UZB', name:'Uzbekistan',           flag:'🇺🇿', conf:'Asia'     },
+  { code:'ENG', name:'England',              flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', conf:'UEFA'     },
+];
+
+function getStickerMeta(n) {
+  if (n === 1)  return { icon:'✨', label:'Logo',   foil:true  };
+  if (n === 13) return { icon:'📸', label:'Photo',  foil:false };
+  return               { icon:'👤', label:'Player', foil:false };
+}
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'panini_wc2026';
+let state = {};
+
+function loadState() {
+  try { state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+  catch(e) { state = {}; }
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function cycleSticker(code) {
+  state[code] = ((state[code] || 0) + 1) % 3;
+  saveState();
+  return state[code];
+}
+
+// ─── GLOBAL STATS ─────────────────────────────────────────────────────────────
+function updateGlobalStats() {
+  let owned = 0, dupe = 0;
+  Object.values(state).forEach(v => { if (v>=1) owned++; if (v===2) dupe++; });
+  const missing = TOTAL - owned;
+  const pct = Math.round(owned / TOTAL * 100);
+  document.getElementById('totalOwned').textContent  = owned;
+  document.getElementById('totalMissing').textContent = missing;
+  document.getElementById('totalDupe').textContent   = dupe;
+  document.getElementById('pct').textContent         = pct + '%';
+  document.getElementById('mainBar').style.width     = pct + '%';
+}
+
+// ─── BUILD ALBUM ──────────────────────────────────────────────────────────────
+function buildAlbum() {
+  const main  = document.getElementById('main');
+  const noRes = document.getElementById('noResults');
+  main.innerHTML = '';
+  main.appendChild(noRes);
+  main.appendChild(buildSpecialSection());
+  TEAMS.forEach(t => main.appendChild(buildTeamSection(t)));
+  updateGlobalStats();
+}
+
+function buildSpecialSection() {
+  const sec = document.createElement('div');
+  sec.className = 'special-section team-section';
+  sec.dataset.name = 'intro special museum';
+
+  const owned = SPECIAL.filter(s => (state[s.code]||0) >= 1).length;
+
+  const header = document.createElement('div');
+  header.className = 'special-header team-header';
+  header.innerHTML = `
+    <div class="team-flag">🌟</div>
+    <div class="team-name special-title">Intro & Special Stickers</div>
+    <div class="team-progress">
+      <div class="team-mini-bar"><div class="team-mini-fill" style="width:${owned/SPECIAL.length*100}%"></div></div>
+      <div class="team-count">${owned}/${SPECIAL.length}</div>
+    </div>
+    <div class="team-chevron">▾</div>`;
+  header.addEventListener('click', () => sec.classList.toggle('collapsed'));
+
+  const grid = document.createElement('div');
+  grid.className = 'sticker-grid';
+  SPECIAL.forEach(s => grid.appendChild(buildStickerCard(s.code, s.icon, s.label, s.foil)));
+
+  sec.appendChild(header);
+  sec.appendChild(grid);
+  return sec;
+}
+
+function buildTeamSection(team) {
+  const sec = document.createElement('div');
+  sec.className = 'team-section';
+  sec.dataset.code = team.code;
+  sec.dataset.conf = team.conf;
+  sec.dataset.name = team.name.toLowerCase() + ' ' + team.code.toLowerCase();
+  sec.id = 'section-' + team.code;
+
+  const header = document.createElement('div');
+  header.className = 'team-header';
+  updateTeamHeader(team, header);
+  header.addEventListener('click', () => sec.classList.toggle('collapsed'));
+
+  const grid = document.createElement('div');
+  grid.className = 'sticker-grid';
+  for (let n = 1; n <= 20; n++) {
+    const meta = getStickerMeta(n);
+    grid.appendChild(buildStickerCard(team.code + n, meta.icon, meta.label + (n!==1&&n!==13?' '+n:''), meta.foil));
+  }
+
+  sec.appendChild(header);
+  sec.appendChild(grid);
+  return sec;
+}
+
+function buildStickerCard(code, icon, label, foil) {
+  const card = document.createElement('div');
+  const s = state[code] || 0;
+  card.className = 'sticker' + (foil?' foil':'') + (s===1?' owned':s===2?' dupe':'');
+  card.dataset.code = code;
+  card.title = code;
+  card.innerHTML = `
+    <div class="sticker-num">${code}</div>
+    <div class="sticker-icon">${icon}</div>
+    <div class="sticker-label">${label}</div>
+    <div class="sticker-status">${s===1?'✅':s===2?'🔁':''}</div>`;
+
+  card.addEventListener('click', () => {
+    const ns = cycleSticker(code);
+    card.classList.toggle('owned', ns===1);
+    card.classList.toggle('dupe',  ns===2);
+    card.querySelector('.sticker-status').textContent = ns===1?'✅':ns===2?'🔁':'';
+    refreshTeamHeader(code);
+    updateGlobalStats();
+    if (activeTab === 'missing') renderMissingView();
+  });
+  return card;
+}
+
+function updateTeamHeader(team, header) {
+  const owned = Array.from({length:20},(_,i)=>team.code+(i+1)).filter(c=>(state[c]||0)>=1).length;
+  header.innerHTML = `
+    <div class="team-flag">${team.flag}</div>
+    <div class="team-name">${team.name}</div>
+    <div class="team-code">${team.code}</div>
+    <div class="team-progress">
+      <div class="team-mini-bar"><div class="team-mini-fill" style="width:${owned/20*100}%"></div></div>
+      <div class="team-count">${owned}/20</div>
+    </div>
+    <div class="team-chevron">▾</div>`;
+}
+
+function refreshTeamHeader(changedCode) {
+  const team = TEAMS.find(t => changedCode.startsWith(t.code));
+  if (!team) {
+    // special section
+    const owned = SPECIAL.filter(s=>(state[s.code]||0)>=1).length;
+    const specSec = document.querySelector('.special-section');
+    if (specSec) {
+      specSec.querySelector('.team-mini-fill').style.width = (owned/SPECIAL.length*100)+'%';
+      specSec.querySelector('.team-count').textContent = owned+'/'+SPECIAL.length;
+    }
+    return;
+  }
+  const sec = document.getElementById('section-'+team.code);
+  if (!sec) return;
+  const header = sec.querySelector('.team-header');
+  updateTeamHeader(team, header);
+  header.addEventListener('click', () => sec.classList.toggle('collapsed'));
+  applyAlbumFilter();
+}
+
+// ─── ALBUM FILTER ─────────────────────────────────────────────────────────────
+let albumFilter = 'all';
+
+function applyAlbumFilter() {
+  const query = document.getElementById('search').value.toLowerCase();
+  let visible = 0;
+  document.querySelectorAll('#main .team-section').forEach(sec => {
+    const nameMatch = !query || (sec.dataset.name||'').toLowerCase().includes(query);
+    let filterMatch = true;
+    const code = sec.dataset.code;
+    if (code && albumFilter !== 'all') {
+      const owned = Array.from({length:20},(_,i)=>code+(i+1)).filter(c=>(state[c]||0)>=1).length;
+      const hasDupe = Array.from({length:20},(_,i)=>code+(i+1)).some(c=>(state[c]||0)===2);
+      if (albumFilter==='missing')  filterMatch = owned < 20;
+      if (albumFilter==='complete') filterMatch = owned === 20;
+      if (albumFilter==='dupe')     filterMatch = hasDupe;
+    }
+    const show = nameMatch && filterMatch;
+    sec.classList.toggle('hidden', !show);
+    if (show) visible++;
+  });
+  document.getElementById('noResults').classList.toggle('show', visible === 0);
+}
+
+// ─── MISSING VIEW ─────────────────────────────────────────────────────────────
+function renderMissingView() {
+  const list = document.getElementById('missingList');
+  const empty = document.getElementById('missingEmpty');
+  const countEl = document.getElementById('missingCount');
+  const query = (document.getElementById('missingSearch')?.value || '').toLowerCase();
+  list.innerHTML = '';
+
+  let totalMissing = 0;
+  let anyBlock = false;
+
+  // Special stickers
+  const specialMissing = SPECIAL.filter(s => (state[s.code]||0) === 0);
+  if (specialMissing.length > 0) {
+    const nameMatch = !query || 'intro special museum'.includes(query);
+    if (nameMatch) {
+      totalMissing += specialMissing.length;
+      anyBlock = true;
+      list.appendChild(buildMissingBlock('🌟', 'Intro & Special', '', specialMissing.map(s=>({code:s.code,foil:s.foil})), null));
+    }
+  }
+
+  // Team stickers
+  TEAMS.forEach(team => {
+    const missingCodes = [];
+    for (let n=1; n<=20; n++) {
+      const code = team.code+n;
+      if ((state[code]||0) === 0) missingCodes.push({ code, foil: n===1 });
+    }
+    if (missingCodes.length === 0) return;
+    const nameMatch = !query || team.name.toLowerCase().includes(query) || team.code.toLowerCase().includes(query);
+    if (!nameMatch) return;
+    totalMissing += missingCodes.length;
+    anyBlock = true;
+    list.appendChild(buildMissingBlock(team.flag, team.name, team.conf, missingCodes, team.code));
+  });
+
+  countEl.textContent = totalMissing > 0 ? `(${totalMissing})` : '';
+  empty.classList.toggle('show', !anyBlock && !query);
+}
+
+function buildMissingBlock(flag, name, conf, missingCodes, teamCode) {
+  const block = document.createElement('div');
+  block.className = 'missing-team-block';
+  if (conf) block.dataset.conf = conf;
+
+  block.innerHTML = `
+    <div class="missing-team-header">
+      <span style="font-size:1.3rem">${flag}</span>
+      <span class="missing-team-name">${name}</span>
+      <span class="missing-count-badge">${missingCodes.length} missing</span>
+    </div>
+    <div class="missing-chips"></div>`;
+
+  const chips = block.querySelector('.missing-chips');
+  missingCodes.forEach(({code, foil}) => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (foil ? ' foil-chip' : '');
+    chip.textContent = code;
+    chip.title = 'Click to mark as owned';
+    chip.addEventListener('click', () => {
+      state[code] = 1;
+      saveState();
+      chip.remove();
+      // Update album sticker card if visible
+      const card = document.querySelector(`.sticker[data-code="${code}"]`);
+      if (card) {
+        card.classList.add('owned');
+        card.querySelector('.sticker-status').textContent = '✅';
+      }
+      // Update block count
+      const remaining = block.querySelectorAll('.chip').length;
+      if (remaining === 0) block.remove();
+      else block.querySelector('.missing-count-badge').textContent = remaining + ' missing';
+      refreshTeamHeader(code);
+      updateGlobalStats();
+    });
+    chips.appendChild(chip);
+  });
+
+  return block;
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+let activeTab = 'album';
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeTab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-album').style.display   = activeTab==='album'   ? 'block' : 'none';
+    document.getElementById('view-missing').style.display = activeTab==='missing' ? 'block' : 'none';
+    if (activeTab === 'missing') renderMissingView();
+  });
+});
+
+// ─── EVENTS ───────────────────────────────────────────────────────────────────
+document.getElementById('search').addEventListener('input', applyAlbumFilter);
+document.getElementById('missingSearch')?.addEventListener('input', renderMissingView);
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    albumFilter = btn.dataset.filter;
+    applyAlbumFilter();
+  });
+});
+
+document.getElementById('btnReset').addEventListener('click', () => {
+  if (!confirm('Reset ALL stickers? This cannot be undone.')) return;
+  state = {};
+  saveState();
+  document.querySelectorAll('.sticker').forEach(card => {
+    card.classList.remove('owned','dupe');
+    card.querySelector('.sticker-status').textContent = '';
+  });
+  TEAMS.forEach(team => {
+    const sec = document.getElementById('section-'+team.code);
+    if (!sec) return;
+    const header = sec.querySelector('.team-header');
+    updateTeamHeader(team, header);
+    header.addEventListener('click', () => sec.classList.toggle('collapsed'));
+  });
+  document.querySelector('.special-section .team-mini-fill').style.width = '0%';
+  document.querySelector('.special-section .team-count').textContent = '0/'+SPECIAL.length;
+  updateGlobalStats();
+  if (activeTab==='missing') renderMissingView();
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadState();
+buildAlbum();
+</script>
+</body>
+</html>
